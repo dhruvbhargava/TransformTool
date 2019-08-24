@@ -6,7 +6,7 @@ Created on Wed Aug 21 23:21:57 2019
 """
 import sys
 import cv2
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import utils
 from  PyQt5 import QtGui as gui
 import PyQt5.QtWidgets as widgets
@@ -20,7 +20,8 @@ class Window(widget):
         self.dims={'left':50,'right':50,'top':10,'width':500,'height':500}
         self.GridCell={'verticle':self.dims['height']/20,'horizontal':self.dims['width']/20}
         self.setWindowTitle("TransformTool")
-        self.Image_cv2=cv2.imread('./Test.jpg',cv2.IMREAD_GRAYSCALE)
+        self.Image_cv2=cv2.imread('./Test.jpg')
+        self.original=cv2.imread('./Test.jpg')
         self.Image=widgets.QLabel(self)
         self.currentTransform=''
         self.Home()
@@ -30,7 +31,6 @@ class Window(widget):
         Button=widgets.QPushButton('Transform',self)
         self.InputField=widgets.QLineEdit(self)
         InputLabel=widgets.QLabel('Transform Function:',self)
-        
         im=gui.QImage(self.Image_cv2.data,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
         PixMap=gui.QPixmap(im)
         PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)
@@ -45,18 +45,20 @@ class Window(widget):
         Button.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*18)
         #actions
         Button.clicked.connect(self.TransformToolAction)
-        self.show()    
+        
     
     def TransformToolAction(self):
             updatedim=utils.transform_Image(self.Image_cv2,self.InputField.text())
+            self.Image_cv2=updatedim
             im=gui.QImage(updatedim,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
             PixMap=gui.QPixmap(im)
             PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)        
             self.Image.setPixmap(PixMap)
     
 if __name__ == '__main__':
-    w=Window()
     App=app(sys.argv)
+    w=Window()
+    w.show()
     sys.exit(App.exec_())
     
 
