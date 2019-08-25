@@ -27,8 +27,13 @@ class Window(widget):
         self.setGeometry(self.dims['left'],self.dims['top'],self.dims['width'],self.dims['height'])
         self.Load()
         self.Home()
+    
+    def save(self):
+        pass
+
         
     def Load(self):
+        self.setWindowTitle("Pick An Image")
         Prompt=widgets.QLabel('Pick an Image')
         Prompt.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*2)
        # Load_btn=widgets.QPushButton('Load',self)
@@ -38,12 +43,13 @@ class Window(widget):
         self.build_img()
     
     def build_img(self):
-        self.pmi=gui.QImage(self.Image_cv2.data,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
+        self.pmi=gui.QImage(self.Image_cv2.data,self.Image_cv2.shape[1],self.Image_cv2.shape[0],self.Image_cv2.shape[1]*3,gui.QImage.Format_RGB888)
         self.PixMap=gui.QPixmap(self.pmi)
         self.PixMap=self.PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)
         self.Image.setPixmap(self.PixMap)
 
     def Home(self):
+        self.setWindowTitle("TransformTool")
         Button=widgets.QPushButton('Transform',self)
         Load_btn=widgets.QPushButton('Load ',self)
         Reset_button=widgets.QPushButton('Reset',self)
@@ -66,19 +72,13 @@ class Window(widget):
     
     def Reset(self):
         self.Image_cv2=self.original
-        im=gui.QImage(self.Image_cv2,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
-        PixMap=gui.QPixmap(im)
-        PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)        
-        self.Image.setPixmap(PixMap)
+        self.build_img()
         
     
     def TransformToolAction(self):
         updatedim=utils.transform_Image(self.Image_cv2,self.InputField.text())
         self.Image_cv2=updatedim
-        im=gui.QImage(updatedim,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
-        PixMap=gui.QPixmap(im)
-        PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)        
-        self.Image.setPixmap(PixMap)
+        self.build_img()
 
 if __name__ == '__main__':
     App=app(sys.argv)
