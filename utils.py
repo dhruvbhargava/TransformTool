@@ -99,12 +99,12 @@ def transform_Image(Image,transform):
         else:
             op1=stack.pop()
             op2=stack.pop()
-            if op1 == 'x':
+            if op1 == 'x' or op1 == 'X':
                 op1=Image
                 op2=int(op2)
                 Image=evaluate(op2,op1,c)
                 stack.append('x')
-            elif op2 == 'x':
+            elif op2 == 'x' or op2 == 'X':
                 op2=Image
                 op1=int(op1)
                 Image=evaluate(op2,op1,c)

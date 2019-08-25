@@ -17,44 +17,69 @@ import  PyQt5.QtCore as QtCore
 class Window(widget):
     def __init__(self):
         super(Window,self).__init__()
-        self.dims={'left':50,'right':50,'top':10,'width':500,'height':500}
+        self.dims={'left':50,'right':50,'top':10,'width':500,'height':550}
         self.GridCell={'verticle':self.dims['height']/20,'horizontal':self.dims['width']/20}
         self.setWindowTitle("TransformTool")
         self.Image_cv2=cv2.imread('./Test.jpg')
         self.original=cv2.imread('./Test.jpg')
         self.Image=widgets.QLabel(self)
         self.currentTransform=''
+        self.setGeometry(self.dims['left'],self.dims['top'],self.dims['width'],self.dims['height'])
+        self.Load()
         self.Home()
         
+    def Load(self):
+        Prompt=widgets.QLabel('Pick an Image')
+        Prompt.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*2)
+       # Load_btn=widgets.QPushButton('Load',self)
+        picker_name=widgets.QFileDialog.getOpenFileName(self)
+        self.Image_cv2=cv2.imread(picker_name[0])
+        self.original=cv2.imread(picker_name[0])
+        self.build_img()
     
+    def build_img(self):
+        self.pmi=gui.QImage(self.Image_cv2.data,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
+        self.PixMap=gui.QPixmap(self.pmi)
+        self.PixMap=self.PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)
+        self.Image.setPixmap(self.PixMap)
+
     def Home(self):
         Button=widgets.QPushButton('Transform',self)
+        Load_btn=widgets.QPushButton('Load ',self)
+        Reset_button=widgets.QPushButton('Reset',self)
         self.InputField=widgets.QLineEdit(self)
-        InputLabel=widgets.QLabel('Transform Function:',self)
-        im=gui.QImage(self.Image_cv2.data,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
-        PixMap=gui.QPixmap(im)
-        PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)
+        InputLabel=widgets.QLabel('Transform Function( ƒ(x) ):',self)
+        self.build_img()
         #laying out widgets
-        self.setGeometry(self.dims['left'],self.dims['top'],self.dims['width'],self.dims['height'])
-        self.Image.setPixmap(PixMap)
         self.Image.resize(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)
-        self.Image.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*2)
+        self.Image.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*3)
+        Load_btn.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*1)
         InputLabel.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*15)
         self.InputField.resize(self.GridCell['horizontal']*18,self.GridCell['verticle']*1.5)
         self.InputField.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*16)
         Button.move(self.GridCell['horizontal']*1,self.GridCell['verticle']*18)
+        Reset_button.move(self.GridCell['horizontal']*15.5,self.GridCell['verticle']*18)
         #actions
+        Reset_button.clicked.connect(self.Reset)
+        Load_btn.clicked.connect(self.Load)
         Button.clicked.connect(self.TransformToolAction)
+    
+    def Reset(self):
+        self.Image_cv2=self.original
+        im=gui.QImage(self.Image_cv2,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
+        PixMap=gui.QPixmap(im)
+        PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)        
+        self.Image.setPixmap(PixMap)
         
     
     def TransformToolAction(self):
-            updatedim=utils.transform_Image(self.Image_cv2,self.InputField.text())
-            self.Image_cv2=updatedim
-            im=gui.QImage(updatedim,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
-            PixMap=gui.QPixmap(im)
-            PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)        
-            self.Image.setPixmap(PixMap)
-    
+        updatedim=utils.transform_Image(self.Image_cv2,self.InputField.text())
+        self.Image_cv2=updatedim
+        im=gui.QImage(updatedim,self.Image_cv2.shape[1],self.Image_cv2.shape[0],gui.QImage.Format_RGB888)
+        PixMap=gui.QPixmap(im)
+        PixMap=PixMap.scaled(self.GridCell['horizontal']*18,self.GridCell['verticle']*13)        
+        self.Image.setPixmap(PixMap)
+
 if __name__ == '__main__':
     App=app(sys.argv)
     w=Window()
